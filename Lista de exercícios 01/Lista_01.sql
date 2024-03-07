@@ -53,5 +53,24 @@ order by Estado, Cidade
 
 /*
 	5. Escreva um comando que exiba o código, a descrição, a área construída e o preço de venda
-dos imóveis em ordem decrescente de preço por metro de área construída.
+	dos imóveis em ordem decrescente de preço por metro de área construída.
 */
+
+SELECT	CodImovel as código, 
+		Imovel as descrição, 
+		AreaConstruida as "Area Construida", 
+		PrecoVenda/AreaConstruida as "preço de venda" 
+FROM Imovel 
+ORDER BY "preço de venda" DESC
+
+
+
+
+
+
+/*
+	6. Escreva um comando que exiba as cidades e o valor total dos imóveis existentes em cada
+	cidade, listando apenas as cidades com mais de um imóvel.
+*/
+
+SELECT distinct Cidade, sum(Imovel.PrecoVenda) from Imovel group by Imovel.Cidade
