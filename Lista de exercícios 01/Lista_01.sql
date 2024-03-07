@@ -74,3 +74,15 @@ ORDER BY "preço de venda" DESC
 */
 
 SELECT distinct Cidade, sum(Imovel.PrecoVenda) from Imovel group by Imovel.Cidade
+
+
+
+
+
+
+/*
+	7. Escreva um comando para apagar os corretores que não realizaram vendas.
+*/
+
+DELETE from Corretor 
+WHERE Corretor.CodCorretor NOT IN (SELECT DISTINCT Venda.CodCorretor FROM Venda)
