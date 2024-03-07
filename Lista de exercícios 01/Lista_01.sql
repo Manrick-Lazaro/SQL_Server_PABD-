@@ -32,3 +32,16 @@ SELECT CodImovel as código, Imovel as descrição FROM Imovel WHERE AreaConstruida
 
 SELECT Zona.Zona, count(*) as "Quantidade de bairros cadastrados." FROM Zona 
 JOIN Bairro on (Zona.CodZona = Bairro.CodZona) GROUP BY Zona.Zona  
+
+
+
+
+
+
+/*
+	4. Escreva um comando que exiba o código, a descrição, a cidade e o estado dos imóveis
+	ordenados por estado e cidade.
+*/
+
+SELECT CodImovel, Imovel, Cidade, Estado FROM Imovel
+order by Estado, Cidade
