@@ -45,3 +45,13 @@ JOIN Bairro on (Zona.CodZona = Bairro.CodZona) GROUP BY Zona.Zona
 
 SELECT CodImovel, Imovel, Cidade, Estado FROM Imovel
 order by Estado, Cidade
+
+
+
+
+
+
+/*
+	5. Escreva um comando que exiba o código, a descrição, a área construída e o preço de venda
+dos imóveis em ordem decrescente de preço por metro de área construída.
+*/
