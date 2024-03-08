@@ -35,3 +35,34 @@ SELECT Products.name, Providers.name FROM Products
 JOIN Providers ON Products.id_providers = Providers.id
 WHERE Providers.name like 'Ajax SA'
 
+
+
+
+
+
+/*
+	Exercício 2618 – Produtos Importados
+
+	O setor de importação da nossa empresa precisa de um
+	relatório sobre a importação de produtos do nosso fornecedor
+	Sansul.
+
+	Sua tarefa é exibir o nome dos produtos, o nome do fornecedor
+	e o nome da categoria, para os produtos fornecidos pelo
+	fornecedor ‘Sansul SA’ e cujo nome da categoria seja ' Super
+	Luxury'.
+*/
+
+SELECT 
+	Products.name AS 'Nome do produto', 
+	Providers.name AS 'Nome do fornecedor',
+	Categories.name AS 'Nome da categoria'
+FROM 
+	Products
+JOIN
+	Providers ON Products.id_providers = Providers.id
+JOIN 
+	Categories ON Products.id_categories = Categories.id
+WHERE 
+	Providers.name = 'Sansul SA' AND Categories.name = 'Super Luxury'
+
