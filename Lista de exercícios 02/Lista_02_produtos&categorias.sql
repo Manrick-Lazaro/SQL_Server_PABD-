@@ -66,3 +66,39 @@ JOIN
 WHERE 
 	Providers.name = 'Sansul SA' AND Categories.name = 'Super Luxury'
 
+
+
+
+
+
+/*
+	Exercício 2619 – Super Luxo
+
+	A nossa empresa está querendo fazer um novo contrato para o
+	fornecimento de novos produtos superluxuosos, e para isso
+	precisamos de alguns dados dos nossos produtos.
+
+	Seu trabalho é exibir o nome dos produtos, nome dos
+	fornecedores e o preço, para os produtos cujo preço seja maior
+	que 1000 e sua categoria seja ‘Super Luxury’.
+*/
+
+SELECT 
+	Products.name AS 'nome do produto',
+	Providers.name AS 'nome do fornecedor',
+	Products.price AS 'preço do produto'
+FROM 
+	Products
+JOIN
+	Providers ON (Products.id_providers = Providers.id)
+JOIN 
+	Categories on (Products.id_categories = Categories.id)
+WHERE
+	Products.price > 1000.00 
+	AND
+	Categories.id = (SELECT DISTINCT Categories.id FROM Categories WHERE Categories.name = 'Super Luxury')
+
+
+SELECT * FROM Products
+SELECT * FROM Providers
+SELECT * FROM Categories
