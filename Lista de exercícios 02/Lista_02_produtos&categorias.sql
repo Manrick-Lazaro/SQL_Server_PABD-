@@ -99,6 +99,36 @@ WHERE
 	Categories.id = (SELECT DISTINCT Categories.id FROM Categories WHERE Categories.name = 'Super Luxury')
 
 
+
+
+
+
+/*
+	Exercício 2621 – Quantidades entre 10 e 20
+
+	Na hora de entregar o relatório de quantos produtos a empresa
+	tem em estoque, uma parte do relatório ficou corrompida, por
+	isso o responsável do estoque lhe pediu uma ajuda, ele quer
+	que você exiba os seguintes dados para ele.
+
+	Exiba o nome dos produtos cujas quantidades estejam entre 10
+	e 20 e cujo nome do fornecedor inicie com a letra ‘P’.
+	Obs.: Os dados do banco de dados desta questão não estão
+	exatamente iguais ao do site.
+*/
+
+SELECT 
+	Products.name AS 'nome do produto'
+FROM 
+	Products
+JOIN 
+	Providers on (Products.id_providers = Providers.id)
+WHERE
+	Products.amount BETWEEN 10 AND 20
+	AND 
+	Providers.name LIKE 'P%'
+
+
 SELECT * FROM Products
 SELECT * FROM Providers
 SELECT * FROM Categories
