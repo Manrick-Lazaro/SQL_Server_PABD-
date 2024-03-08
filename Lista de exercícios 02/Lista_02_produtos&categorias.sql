@@ -129,6 +129,31 @@ WHERE
 	Providers.name LIKE 'P%'
 
 
-SELECT * FROM Products
-SELECT * FROM Providers
-SELECT * FROM Categories
+
+
+
+
+
+/*
+	Exercício 2623 – Categorias com Vários Produtos
+	O setor de vendas precisa de um relatório para saber quais
+	produtos estão sobrando em estoque.
+
+	Para você ajudar o setor de vendas, exiba o nome do produto e
+	o nome da categoria, para os produtos cuja quantidade seja
+	maior que 100 e o código da categoria seja 1,2,3,6 ou 9. Mostre
+	essas informações em ordem crescente pelo código da
+	categoria.
+*/
+
+SELECT 
+	Products.name AS 'nome do produto',
+	Categories.name AS 'nome da categoria'
+FROM 
+	Products
+JOIN
+	Categories ON (Products.id_categories = Categories.id)
+WHERE 
+	Products.amount > 100
+	AND
+	Categories.id IN (1, 2, 3, 6, 9)
