@@ -86,3 +86,15 @@ SELECT distinct Cidade, sum(Imovel.PrecoVenda) from Imovel group by Imovel.Cidad
 
 DELETE from Corretor 
 WHERE Corretor.CodCorretor NOT IN (SELECT DISTINCT Venda.CodCorretor FROM Venda)
+
+
+
+
+
+
+/*
+	8. Escreva um comando para inserir um novo corretor.
+*/
+
+INSERT INTO Corretor (CodCorretor, Corretor, Comissao)
+VALUES (4, 'Manrick', 1.5);
