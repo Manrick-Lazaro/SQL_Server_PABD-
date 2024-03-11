@@ -12,14 +12,18 @@
 SELECT 
 	Departamento.nome AS 'Nome do Departamento', 
 	Divisao.nome AS 'Nome das divisão', 
-	ROUND( AVG(Salarios.Salario), 2) AS Media,  
-	ROUND( MAX(Salarios.Salario), 2) AS Maior
+	ROUND( AVG(Vencimento.valor), 2) AS Media,  
+	ROUND( MAX(Vencimento.valor), 2) AS Maior
 FROM
-	Salarios
+	Emp_venc
 INNER JOIN
-	Departamento ON (Salarios.lotacao = Departamento.cod_dep)
+	Empregado ON (Emp_venc.matr = Empregado.matr)
 INNER JOIN
-	Divisao ON (Salarios.lotacao_div = Divisao.cod_divisao)
+	Vencimento ON (Emp_venc.cod_venc = Vencimento.cod_venc)
+INNER JOIN 
+	Departamento ON (Empregado.gerencia_cod_dep = Departamento.cod_dep)
+INNER JOIN
+	Divisao ON (Departamento.cod_dep = Divisao.cod_dep)
 GROUP BY
 	Departamento.nome , Divisao.nome 
 ORDER BY 
@@ -27,6 +31,16 @@ ORDER BY
 
 
 
+
+
+/*
+	Exercício 2991 - Estatísticas dos Departamentos
+
+	Para cada departamento da empresa, mostrar o nome dele, a
+	quantidade de empregados lotados, a média salarial, o maior
+	salário e o menor salário. O resultado deve estar em ordem
+	decrescente por média salarial.
+*/
 
 select * from Departamento
 select * from Dependente
