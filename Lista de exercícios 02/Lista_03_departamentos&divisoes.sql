@@ -21,13 +21,13 @@ INNER JOIN
 INNER JOIN
 	Vencimento ON (Emp_venc.cod_venc = Vencimento.cod_venc)
 INNER JOIN 
-	Departamento ON (Empregado.gerencia_cod_dep = Departamento.cod_dep)
+	Departamento ON (Empregado.lotacao = Departamento.cod_dep)
 INNER JOIN
 	Divisao ON (Departamento.cod_dep = Divisao.cod_dep)
 GROUP BY
 	Departamento.nome , Divisao.nome 
 ORDER BY 
-	Departamento.nome , Divisao.nome 
+	Media desc 
 
 
 
@@ -41,6 +41,24 @@ ORDER BY
 	salário e o menor salário. O resultado deve estar em ordem
 	decrescente por média salarial.
 */
+
+SELECT
+	Departamento.nome AS 'nome do departamento',
+	COUNT(*) AS 'quantidade de empregados',
+	ROUND( AVG(Vencimento.valor), 2) AS 'média salarias',  
+	ROUND( MAX(Vencimento.valor), 2) AS 'maior salário',
+	ROUND( MIN(Vencimento.valor), 2) AS 'menor salário'
+FROM
+	Emp_venc
+JOIN
+	Empregado ON (Emp_venc.matr = Empregado.matr)
+JOIN
+	Vencimento ON (Emp_venc.cod_venc = Vencimento.cod_venc)
+JOIN 
+	Departamento ON (Empregado.lotacao = Departamento.cod_dep)
+GROUP BY
+	Departamento.nome
+
 
 select * from Departamento
 select * from Dependente
