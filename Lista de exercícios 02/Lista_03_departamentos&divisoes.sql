@@ -94,6 +94,60 @@ GROUP BY
 	Divisao.nome, Departamento.nome
 
 
+
+
+
+
+/*
+	Exercício 2997 – Pagamento dos Empregados
+
+	Para cada empregado, listar nome do departamento, nome do
+	empregado, salário bruto, total de descontos e salário líquido. A
+	saída deve estar agrupada por departamento e divisão. Dentro
+	de cada divisão, a lista de empregados deve estar de forma
+	decrescente por salário líquido.
+*/
+
+WITH 
+	Salarios(matr, nome, lotacao_div, lotacao, Salario ) AS
+(
+	SELECT 
+		Empregado.matr, 
+		Empregado.nome,
+		Empregado.lotacao_div, 
+		Empregado.lotacao,
+		coalesce ( ( 
+			SELECT 
+				sum(Vencimento.valor)
+			FROM 
+				Emp_venc 
+			INNER JOIN
+				Vencimento ON Emp_venc.cod_venc = Vencimento.cod_venc
+			WHERE 
+				(Emp_venc.matr = Empregado.matr)
+		), 0) -
+		coalesce ( ( 
+			SELECT 
+				sum(Desconto.valor)
+			FROM 
+				Emp_desc 
+			INNER JOIN
+				Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
+			WHERE 
+				(Emp_desc.matr = Empregado.matr)
+		), 0) as Salario
+	from Empregado
+)Select Departamento.nome as NomeDep, Divisao.nome as NomeDiv, 
+  Round( avg(Salarios.Salario), 2) as Media,  
+  Round( max(Salarios.Salario), 2) as Maior
+from Salarios
+inner join Departamento on (Salarios.lotacao = Departamento.cod_dep)
+inner join Divisao on (Salarios.lotacao_div = Divisao.cod_divisao)
+group by Departamento.nome , Divisao.nome 
+order by Departamento.nome , Divisao.nome
+
+
+
 select * from Departamento
 select * from Dependente
 select * from Desconto
