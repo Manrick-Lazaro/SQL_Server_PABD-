@@ -58,6 +58,40 @@ JOIN
 	Departamento ON (Empregado.lotacao = Departamento.cod_dep)
 GROUP BY
 	Departamento.nome
+ORDER BY
+	'média salarias' DESC
+
+
+
+
+
+/*
+	Exercício 2992 – Divisões com Maiores Médias Salariais
+
+	Listar as divisões com maiores médias salariais dentro de seus
+	departamentos. A saída deverá apresentar o nome do departamento, 
+	o nome da divisão com maior média salarial do departamento e a 
+	média salarial da divisão. O resultado deve estar em ordem 
+	decrescente usando a média salarial.
+*/
+
+
+SELECT
+	Departamento.nome AS 'nome do departamento',
+	Divisao.nome AS 'Nome da divisão',
+	MAX (Vencimento.valor) AS 'maior valor'	
+FROM
+	Emp_venc
+JOIN
+	Empregado ON (Emp_venc.matr = Empregado.matr)
+JOIN 
+	Departamento ON (Empregado.lotacao = Departamento.cod_dep)
+JOIN
+	Divisao ON (Departamento.cod_dep = Divisao.cod_dep)
+JOIN
+	Vencimento ON (Emp_venc.cod_venc = Vencimento.cod_venc)
+GROUP BY
+	Divisao.nome, Departamento.nome
 
 
 select * from Departamento
