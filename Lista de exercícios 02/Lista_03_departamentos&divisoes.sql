@@ -9,25 +9,52 @@
 	decrescente usando a média salarial.
 */
 
+WITH 
+	Salarios(matr, nome, lotacao_div, lotacao, Salario ) AS
+(
+	SELECT 
+		Empregado.matr, 
+		Empregado.nome,
+		Empregado.lotacao_div, 
+		Empregado.lotacao,
+		coalesce ( ( 
+			SELECT 
+				sum(Vencimento.valor)
+			FROM 
+				Emp_venc 
+			INNER JOIN
+				Vencimento ON Emp_venc.cod_venc = Vencimento.cod_venc
+			WHERE 
+				(Emp_venc.matr = Empregado.matr)
+		), 0) -
+		coalesce ( ( 
+			SELECT 
+				sum(Desconto.valor)
+			FROM 
+				Emp_desc 
+			INNER JOIN
+				Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
+			WHERE 
+				(Emp_desc.matr = Empregado.matr)
+		), 0) as Salario
+	FROM 
+		Empregado
+)
 SELECT 
-	Departamento.nome AS 'Nome do Departamento', 
-	Divisao.nome AS 'Nome das divisão', 
-	ROUND( AVG(Vencimento.valor), 2) AS Media,  
-	ROUND( MAX(Vencimento.valor), 2) AS Maior
-FROM
-	Emp_venc
-INNER JOIN
-	Empregado ON (Emp_venc.matr = Empregado.matr)
-INNER JOIN
-	Vencimento ON (Emp_venc.cod_venc = Vencimento.cod_venc)
+	Departamento.nome AS NomeDepartamento, 
+	Divisao.nome AS NomeDivisao, 
+	ROUND( AVG(Salarios.Salario), 2) AS Media,  
+	ROUND( MAX(Salarios.Salario), 2) AS Maior
+FROM 
+	Salarios
 INNER JOIN 
-	Departamento ON (Empregado.lotacao = Departamento.cod_dep)
-INNER JOIN
-	Divisao ON (Departamento.cod_dep = Divisao.cod_dep)
-GROUP BY
+	Departamento ON (Salarios.lotacao = Departamento.cod_dep)
+INNER JOIN 
+	Divisao ON (Salarios.lotacao_div = Divisao.cod_divisao)
+GROUP BY 
 	Departamento.nome , Divisao.nome 
 ORDER BY 
-	Media desc 
+	Media DESC
 
 
 
