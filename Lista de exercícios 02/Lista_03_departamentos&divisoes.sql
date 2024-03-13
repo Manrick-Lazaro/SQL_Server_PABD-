@@ -351,14 +351,3 @@ WHERE
     S.SalarioLiquido > M.MediaSalarioDivisao
 ORDER BY 
     S.SalarioLiquido DESC;
-
-
-
-select * from Departamento
-select * from Dependente
-select * from Desconto
-select * from Divisao
-select * from Emp_desc
-select * from Emp_venc
-select * from Empregado
-select * from Vencimento
