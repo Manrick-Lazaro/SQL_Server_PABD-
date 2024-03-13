@@ -207,7 +207,7 @@ ORDER BY
 */
 
 WITH 
-	Salarios(matr, nome, lotacao_div, lotacao, Salario_bruto, desconto, salario_liquido ) AS
+	Salarios(matr, nome, lotacao_div, lotacao, salario_bruto, desconto, salario_liquido ) AS
 (
 	SELECT 
 		Empregado.matr, 
@@ -215,16 +215,28 @@ WITH
 		Empregado.lotacao_div, 
 		Empregado.lotacao,
 		coalesce ( (
-			SELECT 
+			SELECT TOP 1
 				Vencimento.valor
 			FROM
 				Emp_venc
 			INNER JOIN
-				Vencimento ON Emp_venc.cod_venc = Vencimento.
-		) )
+				Vencimento ON Emp_venc.cod_venc = Vencimento.cod_venc
+			WHERE
+				emp_venc.matr = Empregado.matr
+		), 0) as salario_bruto,
+		coalesce ( (
+			SELECT TOP 1
+				Desconto.valor
+			FROM
+				Emp_desc
+			INNER JOIN
+				Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
+			WHERE 
+				Emp_desc.matr = Empregado.matr
+		), 0) as desconto,
 		coalesce ( ( 
-			SELECT 
-				sum(Vencimento.valor)
+			SELECT top 1
+				Vencimento.valor
 			FROM 
 				Emp_venc 
 			INNER JOIN
@@ -233,18 +245,112 @@ WITH
 				(Emp_venc.matr = Empregado.matr)
 		), 0) -
 		coalesce ( ( 
-			SELECT 
-				sum(Desconto.valor)
+			SELECT top 1
+				Desconto.valor
 			FROM 
 				Emp_desc 
 			INNER JOIN
 				Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
 			WHERE 
 				(Emp_desc.matr = Empregado.matr)
-		), 0) as Salario
+		), 0) as salario_liquido
 	FROM 
 		Empregado
+),
+DivisaoPorSalario AS
+(
+	SELECT 
+		Departamento.nome AS Nome_Departamento,
+		Divisao.Nome AS Divisao,
+		Salarios.nome AS Nome_Empregado,
+		Salarios.salario_bruto AS Salario_Bruto,
+		Salarios.desconto AS Desonto,
+		Salarios.salario_liquido AS Salario_Liquido,
+		ROW_NUMBER() 
+			OVER 
+			(
+				PARTITION BY 
+					Divisao.nome 
+				ORDER BY
+					Salarios.salario_liquido DESC
+			) AS Rank_Salario_Divisao
+	FROM
+		Salarios
+	INNER JOIN 
+		Departamento ON (Departamento.cod_dep = Salarios.lotacao)
+	INNER JOIN 
+		Divisao ON (Divisao.cod_divisao = Salarios.lotacao_div)
 )
+SELECT 
+	Nome_Departamento,
+	Nome_Empregado,
+	Salario_Bruto,
+	Desonto,
+	Salario_Liquido
+FROM	
+	DivisaoPorSalario
+WHERE 
+	Rank_Salario_Divisao IS NOT NULL
+ORDER BY 
+	Salario_Liquido DESC
+
+
+
+
+
+
+
+/*
+	Exercício 2999 – Maior Salário da Divisão
+
+	Listar nome e salário líquido dos empregados que ganham
+	mais que a média salarial de sua divisão. O resultado deve estar
+	em ordem decrescente por salário.
+	
+	Dica: Você pode utilizar a função
+	COALESCE(check_expression , 0) para substituir algum valor
+	null por zero; além disso, você também pode utilizar a função
+	ROUND(value, 2) para exibir os valores com 2 casas decimais.
+*/
+
+WITH SalariosLiquidos AS (
+    SELECT 
+        Empregado.matr,
+        Empregado.nome AS Nome,
+        Empregado.lotacao_div,
+        COALESCE(
+            (SELECT TOP 1 Vencimento.valor
+            FROM Emp_venc
+            INNER JOIN Vencimento ON Emp_venc.cod_venc = Vencimento.cod_venc
+            WHERE Emp_venc.matr = Empregado.matr), 0) -
+            COALESCE(
+            (SELECT TOP 1 Desconto.valor
+            FROM Emp_desc
+            INNER JOIN Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
+            WHERE Emp_desc.matr = Empregado.matr), 0) AS SalarioLiquido
+    FROM 
+        Empregado
+),
+MediasSalarios AS (
+    SELECT 
+        lotacao_div,
+        AVG(SalarioLiquido) AS MediaSalarioDivisao
+    FROM 
+        SalariosLiquidos
+    GROUP BY 
+        lotacao_div
+)
+SELECT 
+    S.Nome,
+    ROUND(S.SalarioLiquido, 2) AS SalarioLiquido
+FROM 
+    SalariosLiquidos S
+JOIN 
+    MediasSalarios M ON S.lotacao_div = M.lotacao_div
+WHERE 
+    S.SalarioLiquido > M.MediaSalarioDivisao
+ORDER BY 
+    S.SalarioLiquido DESC;
 
 
 
