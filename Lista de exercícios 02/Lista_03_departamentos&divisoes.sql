@@ -75,39 +75,6 @@ ORDER BY
 	decrescente usando a média salarial.
 */
 
-
-SELECT
-	Departamento.nome AS 'nome do departamento',
-	Divisao.nome AS 'Nome da divisão',
-	MAX (Vencimento.valor) AS 'maior valor'	
-FROM
-	Emp_venc
-JOIN
-	Empregado ON (Emp_venc.matr = Empregado.matr)
-JOIN 
-	Departamento ON (Empregado.lotacao = Departamento.cod_dep)
-JOIN
-	Divisao ON (Departamento.cod_dep = Divisao.cod_dep)
-JOIN
-	Vencimento ON (Emp_venc.cod_venc = Vencimento.cod_venc)
-GROUP BY
-	Divisao.nome, Departamento.nome
-
-
-
-
-
-
-/*
-	Exercício 2997 – Pagamento dos Empregados
-
-	Para cada empregado, listar nome do departamento, nome do
-	empregado, salário bruto, total de descontos e salário líquido. A
-	saída deve estar agrupada por departamento e divisão. Dentro
-	de cada divisão, a lista de empregados deve estar de forma
-	decrescente por salário líquido.
-*/
-
 WITH 
 	Salarios(matr, nome, lotacao_div, lotacao, Salario ) AS
 (
@@ -136,15 +103,42 @@ WITH
 			WHERE 
 				(Emp_desc.matr = Empregado.matr)
 		), 0) as Salario
-	from Empregado
-)Select Departamento.nome as NomeDep, Divisao.nome as NomeDiv, 
-  Round( avg(Salarios.Salario), 2) as Media,  
-  Round( max(Salarios.Salario), 2) as Maior
-from Salarios
-inner join Departamento on (Salarios.lotacao = Departamento.cod_dep)
-inner join Divisao on (Salarios.lotacao_div = Divisao.cod_divisao)
-group by Departamento.nome , Divisao.nome 
-order by Departamento.nome , Divisao.nome
+	FROM 
+		Empregado
+)
+SELECT 
+	Departamento.nome AS NomeDepartamento, 
+	Divisao.nome AS NomeDivisao, 
+	ROUND( AVG(Salarios.Salario), 2) AS Media,  
+	ROUND( MAX(Salarios.Salario), 2) AS Maior
+FROM 
+	Salarios
+INNER JOIN 
+	Departamento ON (Salarios.lotacao = Departamento.cod_dep)
+INNER JOIN 
+	Divisao ON (Salarios.lotacao_div = Divisao.cod_divisao)
+GROUP BY 
+	Departamento.nome , Divisao.nome 
+ORDER BY 
+	Media DESC
+
+
+
+
+
+
+
+/*
+	Exercício 2997 – Pagamento dos Empregados
+
+	Para cada empregado, listar nome do departamento, nome do
+	empregado, salário bruto, total de descontos e salário líquido. A
+	saída deve estar agrupada por departamento e divisão. Dentro
+	de cada divisão, a lista de empregados deve estar de forma
+	decrescente por salário líquido.
+*/
+
+
 
 
 
