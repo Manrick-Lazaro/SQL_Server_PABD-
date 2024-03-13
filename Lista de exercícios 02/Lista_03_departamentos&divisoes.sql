@@ -162,22 +162,33 @@ WITH
 		), 0) as Salario
 	FROM 
 		Empregado
-)
+) ,
+RankDivisao AS
+(
+	SELECT 
+		Departamento.nome AS NomeDepartamento,
+		Divisao.nome AS NomeDivisao,
+		AVG(Salarios.salario) AS MediaSalarial,
+		ROW_NUMBER() OVER(PARTITION BY Departamento.nome ORDER BY AVG(Salarios.salario) DESC) AS RankDivisao
+	FROM
+		Salarios
+	JOIN
+		Departamento ON (Departamento.cod_dep = Salarios.lotacao)
+	JOIN
+		Divisao ON (Divisao.cod_divisao = Salarios.lotacao_div)
+	GROUP BY
+		Divisao.nome, Departamento.nome
+) 
 SELECT 
-	Departamento.nome AS NomeDepartamento, 
-	Divisao.nome AS NomeDivisao, 
-	ROUND( AVG(Salarios.Salario), 2) AS Media,  
-	ROUND( MAX(Salarios.Salario), 2) AS Maior
-FROM 
-	Salarios
-INNER JOIN 
-	Departamento ON (Salarios.lotacao = Departamento.cod_dep)
-INNER JOIN 
-	Divisao ON (Salarios.lotacao_div = Divisao.cod_divisao)
-GROUP BY 
-	Departamento.nome , Divisao.nome 
-ORDER BY 
-	Media DESC
+	RankDivisao.NomeDepartamento,
+	RankDivisao.NomeDivisao,
+	RankDivisao.MediaSalarial
+FROM
+	RankDivisao
+WHERE 
+	RankDivisao.RankDivisao = 1
+ORDER BY
+	RankDivisao.MediaSalarial DESC
 
 
 
