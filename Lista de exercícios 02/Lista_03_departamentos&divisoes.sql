@@ -69,24 +69,54 @@ ORDER BY
 	decrescente por média salarial.
 */
 
+WITH 
+	Salarios(matr, nome, lotacao_div, lotacao, Salario ) AS
+(
+	SELECT 
+		Empregado.matr, 
+		Empregado.nome,
+		Empregado.lotacao_div, 
+		Empregado.lotacao,
+		coalesce ( ( 
+			SELECT 
+				sum(Vencimento.valor)
+			FROM 
+				Emp_venc 
+			INNER JOIN
+				Vencimento ON Emp_venc.cod_venc = Vencimento.cod_venc
+			WHERE 
+				(Emp_venc.matr = Empregado.matr)
+		), 0) -
+		coalesce ( ( 
+			SELECT 
+				sum(Desconto.valor)
+			FROM 
+				Emp_desc 
+			INNER JOIN
+				Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
+			WHERE 
+				(Emp_desc.matr = Empregado.matr)
+		), 0) as Salario
+	FROM 
+		Empregado
+) 
 SELECT
 	Departamento.nome AS 'nome do departamento',
 	COUNT(*) AS 'quantidade de empregados',
-	ROUND( AVG(Vencimento.valor), 2) AS 'média salarias',  
-	ROUND( MAX(Vencimento.valor), 2) AS 'maior salário',
-	ROUND( MIN(Vencimento.valor), 2) AS 'menor salário'
+	ROUND( AVG(Salarios.Salario), 2) AS 'média salarias',  
+	ROUND( MAX(Salarios.Salario), 2) AS 'maior salário',
+	ROUND( MIN(Salarios.Salario), 2) AS 'menor salário'
 FROM
-	Emp_venc
-JOIN
-	Empregado ON (Emp_venc.matr = Empregado.matr)
-JOIN
-	Vencimento ON (Emp_venc.cod_venc = Vencimento.cod_venc)
+	Salarios
 JOIN 
-	Departamento ON (Empregado.lotacao = Departamento.cod_dep)
+	Departamento ON (Salarios.lotacao = Departamento.cod_dep)
 GROUP BY
 	Departamento.nome
 ORDER BY
 	'média salarias' DESC
+
+
+
 
 
 
