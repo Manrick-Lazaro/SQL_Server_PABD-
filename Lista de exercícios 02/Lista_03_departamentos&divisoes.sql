@@ -206,7 +206,45 @@ ORDER BY
 	decrescente por salário líquido.
 */
 
-
+WITH 
+	Salarios(matr, nome, lotacao_div, lotacao, Salario_bruto, desconto, salario_liquido ) AS
+(
+	SELECT 
+		Empregado.matr, 
+		Empregado.nome,
+		Empregado.lotacao_div, 
+		Empregado.lotacao,
+		coalesce ( (
+			SELECT 
+				Vencimento.valor
+			FROM
+				Emp_venc
+			INNER JOIN
+				Vencimento ON Emp_venc.cod_venc = Vencimento.
+		) )
+		coalesce ( ( 
+			SELECT 
+				sum(Vencimento.valor)
+			FROM 
+				Emp_venc 
+			INNER JOIN
+				Vencimento ON Emp_venc.cod_venc = Vencimento.cod_venc
+			WHERE 
+				(Emp_venc.matr = Empregado.matr)
+		), 0) -
+		coalesce ( ( 
+			SELECT 
+				sum(Desconto.valor)
+			FROM 
+				Emp_desc 
+			INNER JOIN
+				Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
+			WHERE 
+				(Emp_desc.matr = Empregado.matr)
+		), 0) as Salario
+	FROM 
+		Empregado
+)
 
 
 
