@@ -76,22 +76,51 @@ ORDER BY
 */
 
 
-SELECT
-	Departamento.nome AS 'nome do departamento',
-	Divisao.nome AS 'Nome da divisão',
-	MAX (Vencimento.valor) AS 'maior valor'	
-FROM
-	Emp_venc
-JOIN
-	Empregado ON (Emp_venc.matr = Empregado.matr)
-JOIN 
-	Departamento ON (Empregado.lotacao = Departamento.cod_dep)
-JOIN
-	Divisao ON (Departamento.cod_dep = Divisao.cod_dep)
-JOIN
-	Vencimento ON (Emp_venc.cod_venc = Vencimento.cod_venc)
-GROUP BY
-	Divisao.nome, Departamento.nome
+WITH 
+	Salarios(matr, nome, lotacao_div, lotacao, Salario ) AS
+(
+	SELECT 
+		Empregado.matr, 
+		Empregado.nome,
+		Empregado.lotacao_div, 
+		Empregado.lotacao,
+		coalesce ( ( 
+			SELECT 
+				sum(Vencimento.valor)
+			FROM 
+				Emp_venc 
+			INNER JOIN
+				Vencimento ON Emp_venc.cod_venc = Vencimento.cod_venc
+			WHERE 
+				(Emp_venc.matr = Empregado.matr)
+		), 0) -
+		coalesce ( ( 
+			SELECT 
+				sum(Desconto.valor)
+			FROM 
+				Emp_desc 
+			INNER JOIN
+				Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
+			WHERE 
+				(Emp_desc.matr = Empregado.matr)
+		), 0) as Salario
+	from Empregado
+)
+SELECT 
+	Departamento.nome as NomeDep, 
+	Divisao.nome as NomeDiv, 
+	Round( avg(Salarios.Salario), 2) as Media,  
+	Round( max(Salarios.Salario), 2) as Maior
+FROM 
+	Salarios
+INNER JOIN 
+	Departamento on (Salarios.lotacao = Departamento.cod_dep)
+INNER JOIN 
+	Divisao on (Salarios.lotacao_div = Divisao.cod_divisao)
+GROUP BY 
+	Departamento.nome , Divisao.nome 
+ORDER BY 
+	Departamento.nome , Divisao.nome
 
 
 
@@ -137,14 +166,7 @@ WITH
 				(Emp_desc.matr = Empregado.matr)
 		), 0) as Salario
 	from Empregado
-)Select Departamento.nome as NomeDep, Divisao.nome as NomeDiv, 
-  Round( avg(Salarios.Salario), 2) as Media,  
-  Round( max(Salarios.Salario), 2) as Maior
-from Salarios
-inner join Departamento on (Salarios.lotacao = Departamento.cod_dep)
-inner join Divisao on (Salarios.lotacao_div = Divisao.cod_divisao)
-group by Departamento.nome , Divisao.nome 
-order by Departamento.nome , Divisao.nome
+) SELECT * FROM Salarios
 
 
 
