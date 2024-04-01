@@ -1,17 +1,17 @@
--- Lista de excercício 03 - Departamentos e Divisões
+-- Lista de excercï¿½cio 03 - Departamentos e Divisï¿½es
 
 /*
-	Exercício 2989 – Departamentos e Divisões
+	Exercï¿½cio 2989 ï¿½ Departamentos e Divisï¿½es
 
 	Para cada departamento, mostrar o nome do departamento, o
-	nome de suas divisões, com a respectiva média salarial e o
-	maior salário de cada divisão. O resultado deve estar em ordem
-	decrescente usando a média salarial.
+	nome de suas divisï¿½es, com a respectiva mï¿½dia salarial e o
+	maior salï¿½rio de cada divisï¿½o. O resultado deve estar em ordem
+	decrescente usando a mï¿½dia salarial.
 */
 
 SELECT 
 	Departamento.nome AS 'Nome do Departamento', 
-	Divisao.nome AS 'Nome das divisão', 
+	Divisao.nome AS 'Nome das divisï¿½o', 
 	ROUND( AVG(Vencimento.valor), 2) AS Media,  
 	ROUND( MAX(Vencimento.valor), 2) AS Maior
 FROM
@@ -34,20 +34,20 @@ ORDER BY
 
 
 /*
-	Exercício 2991 - Estatísticas dos Departamentos
+	Exercï¿½cio 2991 - Estatï¿½sticas dos Departamentos
 
 	Para cada departamento da empresa, mostrar o nome dele, a
-	quantidade de empregados lotados, a média salarial, o maior
-	salário e o menor salário. O resultado deve estar em ordem
-	decrescente por média salarial.
+	quantidade de empregados lotados, a mï¿½dia salarial, o maior
+	salï¿½rio e o menor salï¿½rio. O resultado deve estar em ordem
+	decrescente por mï¿½dia salarial.
 */
 
 SELECT
 	Departamento.nome AS 'nome do departamento',
 	COUNT(*) AS 'quantidade de empregados',
-	ROUND( AVG(Vencimento.valor), 2) AS 'média salarias',  
-	ROUND( MAX(Vencimento.valor), 2) AS 'maior salário',
-	ROUND( MIN(Vencimento.valor), 2) AS 'menor salário'
+	ROUND( AVG(Vencimento.valor), 2) AS 'mï¿½dia salarias',  
+	ROUND( MAX(Vencimento.valor), 2) AS 'maior salï¿½rio',
+	ROUND( MIN(Vencimento.valor), 2) AS 'menor salï¿½rio'
 FROM
 	Emp_venc
 JOIN
@@ -59,20 +59,20 @@ JOIN
 GROUP BY
 	Departamento.nome
 ORDER BY
-	'média salarias' DESC
+	'mï¿½dia salarias' DESC
 
 
 
 
 
 /*
-	Exercício 2992 – Divisões com Maiores Médias Salariais
+	Exercï¿½cio 2992 ï¿½ Divisï¿½es com Maiores Mï¿½dias Salariais
 
-	Listar as divisões com maiores médias salariais dentro de seus
-	departamentos. A saída deverá apresentar o nome do departamento, 
-	o nome da divisão com maior média salarial do departamento e a 
-	média salarial da divisão. O resultado deve estar em ordem 
-	decrescente usando a média salarial.
+	Listar as divisï¿½es com maiores mï¿½dias salariais dentro de seus
+	departamentos. A saï¿½da deverï¿½ apresentar o nome do departamento, 
+	o nome da divisï¿½o com maior mï¿½dia salarial do departamento e a 
+	mï¿½dia salarial da divisï¿½o. O resultado deve estar em ordem 
+	decrescente usando a mï¿½dia salarial.
 */
 
 
@@ -128,13 +128,13 @@ ORDER BY
 
 
 /*
-	Exercício 2997 – Pagamento dos Empregados
+	Exercï¿½cio 2997 ï¿½ Pagamento dos Empregados
 
 	Para cada empregado, listar nome do departamento, nome do
-	empregado, salário bruto, total de descontos e salário líquido. A
-	saída deve estar agrupada por departamento e divisão. Dentro
-	de cada divisão, a lista de empregados deve estar de forma
-	decrescente por salário líquido.
+	empregado, salï¿½rio bruto, total de descontos e salï¿½rio lï¿½quido. A
+	saï¿½da deve estar agrupada por departamento e divisï¿½o. Dentro
+	de cada divisï¿½o, a lista de empregados deve estar de forma
+	decrescente por salï¿½rio lï¿½quido.
 */
 
 WITH 
@@ -170,11 +170,296 @@ WITH
 
 
 
-select * from Departamento
-select * from Dependente
-select * from Desconto
-select * from Divisao
-select * from Emp_desc
-select * from Emp_venc
-select * from Empregado
-select * from Vencimento
+
+
+/*
+	Exercï¿½cio 2991 - Estatï¿½sticas dos Departamentos
+
+	Para cada departamento da empresa, mostrar o nome dele, a
+	quantidade de empregados lotados, a mï¿½dia salarial, o maior
+	salï¿½rio e o menor salï¿½rio. O resultado deve estar em ordem
+	decrescente por mï¿½dia salarial.
+*/
+
+WITH 
+	Salarios(matr, nome, lotacao_div, lotacao, Salario ) AS
+(
+	SELECT 
+		Empregado.matr, 
+		Empregado.nome,
+		Empregado.lotacao_div, 
+		Empregado.lotacao,
+		coalesce ( ( 
+			SELECT 
+				sum(Vencimento.valor)
+			FROM 
+				Emp_venc 
+			INNER JOIN
+				Vencimento ON Emp_venc.cod_venc = Vencimento.cod_venc
+			WHERE 
+				(Emp_venc.matr = Empregado.matr)
+		), 0) -
+		coalesce ( ( 
+			SELECT 
+				sum(Desconto.valor)
+			FROM 
+				Emp_desc 
+			INNER JOIN
+				Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
+			WHERE 
+				(Emp_desc.matr = Empregado.matr)
+		), 0) as Salario
+	FROM 
+		Empregado
+) 
+SELECT
+	Departamento.nome AS 'nome do departamento',
+	COUNT(*) AS 'quantidade de empregados',
+	ROUND( AVG(Salarios.Salario), 2) AS 'mï¿½dia salarias',  
+	ROUND( MAX(Salarios.Salario), 2) AS 'maior salï¿½rio',
+	ROUND( MIN(Salarios.Salario), 2) AS 'menor salï¿½rio'
+FROM
+	Salarios
+JOIN 
+	Departamento ON (Salarios.lotacao = Departamento.cod_dep)
+GROUP BY
+	Departamento.nome
+ORDER BY
+	'mï¿½dia salarias' DESC
+
+
+
+
+
+
+
+
+/*
+	Exercï¿½cio 2992 ï¿½ Divisï¿½es com Maiores Mï¿½dias Salariais
+
+	Listar as divisï¿½es com maiores mï¿½dias salariais dentro de seus
+	departamentos. A saï¿½da deverï¿½ apresentar o nome do departamento, 
+	o nome da divisï¿½o com maior mï¿½dia salarial do departamento e a 
+	mï¿½dia salarial da divisï¿½o. O resultado deve estar em ordem 
+	decrescente usando a mï¿½dia salarial.
+*/
+
+WITH 
+	Salarios(matr, nome, lotacao_div, lotacao, Salario ) AS
+(
+	SELECT 
+		Empregado.matr, 
+		Empregado.nome,
+		Empregado.lotacao_div, 
+		Empregado.lotacao,
+		coalesce ( ( 
+			SELECT 
+				sum(Vencimento.valor)
+			FROM 
+				Emp_venc 
+			INNER JOIN
+				Vencimento ON Emp_venc.cod_venc = Vencimento.cod_venc
+			WHERE 
+				(Emp_venc.matr = Empregado.matr)
+		), 0) -
+		coalesce ( ( 
+			SELECT 
+				sum(Desconto.valor)
+			FROM 
+				Emp_desc 
+			INNER JOIN
+				Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
+			WHERE 
+				(Emp_desc.matr = Empregado.matr)
+		), 0) as Salario
+	FROM 
+		Empregado
+) ,
+RankDivisao AS
+(
+	SELECT 
+		Departamento.nome AS NomeDepartamento,
+		Divisao.nome AS NomeDivisao,
+		AVG(Salarios.salario) AS MediaSalarial,
+		ROW_NUMBER() OVER(PARTITION BY Departamento.nome ORDER BY AVG(Salarios.salario) DESC) AS RankDivisao
+	FROM
+		Salarios
+	JOIN
+		Departamento ON (Departamento.cod_dep = Salarios.lotacao)
+	JOIN
+		Divisao ON (Divisao.cod_divisao = Salarios.lotacao_div)
+	GROUP BY
+		Divisao.nome, Departamento.nome
+) 
+SELECT 
+	RankDivisao.NomeDepartamento,
+	RankDivisao.NomeDivisao,
+	RankDivisao.MediaSalarial
+FROM
+	RankDivisao
+WHERE 
+	RankDivisao.RankDivisao = 1
+ORDER BY
+	RankDivisao.MediaSalarial DESC
+
+
+
+
+
+
+
+/*
+	Exercï¿½cio 2997 ï¿½ Pagamento dos Empregados
+
+	Para cada empregado, listar nome do departamento, nome do
+	empregado, salï¿½rio bruto, total de descontos e salï¿½rio lï¿½quido. A
+	saï¿½da deve estar agrupada por departamento e divisï¿½o. Dentro
+	de cada divisï¿½o, a lista de empregados deve estar de forma
+	decrescente por salï¿½rio lï¿½quido.
+*/
+
+WITH 
+	Salarios(matr, nome, lotacao_div, lotacao, salario_bruto, desconto, salario_liquido ) AS
+(
+	SELECT 
+		Empregado.matr, 
+		Empregado.nome,
+		Empregado.lotacao_div, 
+		Empregado.lotacao,
+		coalesce ( (
+			SELECT TOP 1
+				Vencimento.valor
+			FROM
+				Emp_venc
+			INNER JOIN
+				Vencimento ON Emp_venc.cod_venc = Vencimento.cod_venc
+			WHERE
+				emp_venc.matr = Empregado.matr
+		), 0) as salario_bruto,
+		coalesce ( (
+			SELECT TOP 1
+				Desconto.valor
+			FROM
+				Emp_desc
+			INNER JOIN
+				Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
+			WHERE 
+				Emp_desc.matr = Empregado.matr
+		), 0) as desconto,
+		coalesce ( ( 
+			SELECT top 1
+				Vencimento.valor
+			FROM 
+				Emp_venc 
+			INNER JOIN
+				Vencimento ON Emp_venc.cod_venc = Vencimento.cod_venc
+			WHERE 
+				(Emp_venc.matr = Empregado.matr)
+		), 0) -
+		coalesce ( ( 
+			SELECT top 1
+				Desconto.valor
+			FROM 
+				Emp_desc 
+			INNER JOIN
+				Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
+			WHERE 
+				(Emp_desc.matr = Empregado.matr)
+		), 0) as salario_liquido
+	FROM 
+		Empregado
+),
+DivisaoPorSalario AS
+(
+	SELECT 
+		Departamento.nome AS Nome_Departamento,
+		Divisao.Nome AS Divisao,
+		Salarios.nome AS Nome_Empregado,
+		Salarios.salario_bruto AS Salario_Bruto,
+		Salarios.desconto AS Desonto,
+		Salarios.salario_liquido AS Salario_Liquido,
+		ROW_NUMBER() 
+			OVER 
+			(
+				PARTITION BY 
+					Divisao.nome 
+				ORDER BY
+					Salarios.salario_liquido DESC
+			) AS Rank_Salario_Divisao
+	FROM
+		Salarios
+	INNER JOIN 
+		Departamento ON (Departamento.cod_dep = Salarios.lotacao)
+	INNER JOIN 
+		Divisao ON (Divisao.cod_divisao = Salarios.lotacao_div)
+)
+SELECT 
+	Nome_Departamento,
+	Nome_Empregado,
+	Salario_Bruto,
+	Desonto,
+	Salario_Liquido
+FROM	
+	DivisaoPorSalario
+WHERE 
+	Rank_Salario_Divisao IS NOT NULL
+ORDER BY 
+	Salario_Liquido DESC
+
+
+
+
+
+
+
+/*
+	Exercï¿½cio 2999 ï¿½ Maior Salï¿½rio da Divisï¿½o
+
+	Listar nome e salï¿½rio lï¿½quido dos empregados que ganham
+	mais que a mï¿½dia salarial de sua divisï¿½o. O resultado deve estar
+	em ordem decrescente por salï¿½rio.
+	
+	Dica: Vocï¿½ pode utilizar a funï¿½ï¿½o
+	COALESCE(check_expression , 0) para substituir algum valor
+	null por zero; alï¿½m disso, vocï¿½ tambï¿½m pode utilizar a funï¿½ï¿½o
+	ROUND(value, 2) para exibir os valores com 2 casas decimais.
+*/
+
+WITH SalariosLiquidos AS (
+    SELECT 
+        Empregado.matr,
+        Empregado.nome AS Nome,
+        Empregado.lotacao_div,
+        COALESCE(
+            (SELECT TOP 1 Vencimento.valor
+            FROM Emp_venc
+            INNER JOIN Vencimento ON Emp_venc.cod_venc = Vencimento.cod_venc
+            WHERE Emp_venc.matr = Empregado.matr), 0) -
+            COALESCE(
+            (SELECT TOP 1 Desconto.valor
+            FROM Emp_desc
+            INNER JOIN Desconto ON Emp_desc.cod_desc = Desconto.cod_desc
+            WHERE Emp_desc.matr = Empregado.matr), 0) AS SalarioLiquido
+    FROM 
+        Empregado
+),
+MediasSalarios AS (
+    SELECT 
+        lotacao_div,
+        AVG(SalarioLiquido) AS MediaSalarioDivisao
+    FROM 
+        SalariosLiquidos
+    GROUP BY 
+        lotacao_div
+)
+SELECT 
+    S.Nome,
+    ROUND(S.SalarioLiquido, 2) AS SalarioLiquido
+FROM 
+    SalariosLiquidos S
+JOIN 
+    MediasSalarios M ON S.lotacao_div = M.lotacao_div
+WHERE 
+    S.SalarioLiquido > M.MediaSalarioDivisao
+ORDER BY 
+    S.SalarioLiquido DESC;
