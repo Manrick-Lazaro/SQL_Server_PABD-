@@ -73,3 +73,36 @@ CREATE PROCEDURE title_count_authors AS
 		name_title
 
 EXEC title_count_authors
+
+
+
+/*
+	3. Crie um procedimento armazenado para retornar como resultado a quantidade de editoras com
+	mais de 5 livros editados. Apresente os comandos utilizados para executar este procedimento.
+*/
+
+CREATE PROCEDURE quantity_publishers_whith_more_than_5_titles AS
+	DECLARE 
+		@quantity int
+	
+	SELECT	
+		@quantity = COUNT(*)
+	FROM
+	(
+		SELECT	
+			titles.pub_id
+		FROM
+			titles
+		GROUP BY
+			pub_id
+		HAVING
+			COUNT(*) > 5
+	) AS publishers_with_more_than_5_titles
+
+	RETURN @quantity
+
+DECLARE @value int 
+
+EXEC @value = quantity_publishers_whith_more_than_5_titles
+
+PRINT @value
