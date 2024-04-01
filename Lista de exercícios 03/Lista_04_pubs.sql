@@ -35,3 +35,41 @@ AS
 		name_title, name_author
 
 EXEC show_title_data
+
+
+
+/*
+	2. Crie um procedimento armazenado para exibir código do livro, o título do livro e a quantidade
+	de autores do livro, ordenando por título do livro. Apresente os comandos utilizados para
+	executar este procedimento.
+*/
+
+CREATE PROCEDURE title_count_authors AS
+	WITH title_table(id_title, name_title, qtt_authors) AS
+	(
+		SELECT
+			titles.title_id,
+			titles.title,
+			(
+				SELECT 
+					COUNT(*)
+				FROM
+					titleauthor
+				INNER JOIN 
+					authors ON authors.au_id = titleauthor.au_id
+				WHERE
+					titles.title_id = titleauthor.title_id
+			)
+		FROM
+			titles
+	)
+	SELECT
+		id_title,
+		name_title,
+		qtt_authors AS quantity_authors
+	FROM
+		title_table
+	ORDER BY
+		name_title
+
+EXEC title_count_authors
