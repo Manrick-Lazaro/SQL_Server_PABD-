@@ -167,3 +167,20 @@ EXEC new_store
 	'Seattle',
 	'WA',
 	'98056'
+
+
+
+
+/*
+	5. Crie um procedimento armazenado para apagar as lojas de livros que não realizaram vendas.
+	Apresente os comandos utilizados para executar este procedimento.
+*/
+
+ALTER PROCEDURE delete_store_with_lass_than_null_sales AS
+	DELETE FROM	
+		stores	
+	WHERE
+		stor_id NOT IN (SELECT DISTINCT stor_id FROM sales)
+		
+
+EXEC delete_store_with_lass_than_null_sales
