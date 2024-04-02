@@ -106,3 +106,64 @@ DECLARE @value int
 EXEC @value = quantity_publishers_whith_more_than_5_titles
 
 PRINT @value
+
+
+
+/*
+	4. Crie um procedimento armazenado para inserir uma nova loja de livros. O comando deve
+	apresentar uma mensagem de erro caso se tente inserir uma loja com código ou nome já
+	existente. Apresente os comandos utilizados para executar este procedimento.
+*/
+
+ALTER PROCEDURE new_store
+@id varchar(30), 
+@name varchar(80),
+@address varchar(60),
+@city varchar(60),
+@state varchar(60),
+@zip varchar(60)
+AS
+	DECLARE 
+		@name_exists varchar(80),
+		@id_exists varchar(30),
+		@error_name_msg varchar(300) = 'Usuário com este nome já existe.',
+		@error_id_msg varchar(300) = 'Usuário com este código já esxite.';
+
+	SELECT 
+		@name_exists = stor_name
+	FROM
+		stores
+	WHERE
+		stor_name = @name
+		
+		
+	SELECT 
+		@id_exists = stor_id
+	FROM
+		stores
+	WHERE	
+		stor_id = @id
+
+	IF (@name = @name_exists)
+		BEGIN
+			RAISERROR (@error_name_msg, 16, 1);
+			RETURN;
+		END
+	ELSE IF (@id = @id_exists)
+		BEGIN
+			RAISERROR (@error_id_msg, 16, 1);
+			RETURN 
+		END
+
+	INSERT 
+		[dbo].[stores] ([stor_id], [stor_name], [stor_address], [city], [state], [zip])
+	VALUES
+		(@id, @name, @address, @city, @state, @zip)
+
+EXEC new_store 
+	'101', 
+	'Santos do deus calor', 
+	'788 Catamaugus Ave.', 
+	'Seattle',
+	'WA',
+	'98056'
