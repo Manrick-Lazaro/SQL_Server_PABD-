@@ -294,3 +294,24 @@ BEGIN
 END;
 
 EXEC list_authors_without_books;
+
+
+
+/*
+10. Crie um procedimento armazenado que retorne o valor total vendido por um livro passado
+como parâmetro. Apresente os comandos utilizados para executar este procedimento.
+*/
+
+CREATE PROCEDURE get_total_sales_by_book
+    @book_title VARCHAR(255),
+    @total_sales MONEY OUTPUT
+AS
+BEGIN
+    SELECT @total_sales = SUM(qty * price)
+    FROM sales
+    WHERE title_id = (SELECT title_id FROM titles WHERE title = @book_title);
+END;
+
+DECLARE @total_sales MONEY;
+EXEC get_total_sales_by_book 'Nome do Livro', @total_sales OUTPUT;
+SELECT @total_sales AS 'Total de Vendas';
