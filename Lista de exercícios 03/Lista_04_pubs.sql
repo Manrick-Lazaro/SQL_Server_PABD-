@@ -315,3 +315,32 @@ END;
 DECLARE @total_sales MONEY;
 EXEC get_total_sales_by_book 'Nome do Livro', @total_sales OUTPUT;
 SELECT @total_sales AS 'Total de Vendas';
+
+
+
+/*
+11. Crie um procedimento armazenado que retorne o valor total de royalties devido a um autor
+passado como parâmetro. Apresente os comandos utilizados para executar este procedimento.
+*/
+
+CREATE PROCEDURE get_total_royalties_by_author
+    @author_id VARCHAR(255),
+    @total_royalties MONEY OUTPUT
+AS
+BEGIN
+    SELECT @total_royalties = SUM(royaltyper * price * qty)
+    FROM titleauthor
+    INNER JOIN titles ON titleauthor.title_id = titles.title_id
+    INNER JOIN sales ON titles.title_id = sales.title_id
+    WHERE titleauthor.au_id = @author_id;
+END;
+
+DECLARE @total_royalties MONEY;
+EXEC get_total_royalties_by_author 'ID do Autor', @total_royalties OUTPUT;
+SELECT @total_royalties AS 'Total de Royalties';
+
+/*
+12. Crie um procedimento armazenado que retorne o valor total de royalties devidos por uma
+editora passada como parâmetro. Apresente os comandos utilizados para executar este
+procedimento.
+*/
