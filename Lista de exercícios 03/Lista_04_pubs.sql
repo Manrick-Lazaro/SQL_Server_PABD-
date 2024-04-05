@@ -250,3 +250,28 @@ END;
 DECLARE @author VARCHAR(100);
 EXEC get_author_with_highest_avg_cost @author OUTPUT;
 SELECT 'Autor com valor médio de custo mais alto: ' + COALESCE(author, 'Nenhum autor encontrado') AS 'Autor';
+
+
+
+/*
+	8. Crie um procedimento armazenado para apresentar a lista de títulos nos quais a soma dos
+	royalties sobre as vendas que os autores têm direito difere de 100%.
+*/
+CREATE PROCEDURE list_titles_with_unequal_royalties
+AS
+BEGIN
+    SELECT 
+        titles.title_id,
+        titles.title,
+        SUM(titleauthor.royaltyper) AS total_royalties
+    FROM 
+        titles
+    INNER JOIN 
+        titleauthor ON titles.title_id = titleauthor.title_id
+    GROUP BY 
+        titles.title_id, titles.title
+    HAVING 
+        ABS(SUM(titleauthor.royaltyper) - 100) > 0.001; -- Verificando se a diferença é maior que 0.1%
+END;
+
+EXEC list_titles_with_unequal_royalties;
