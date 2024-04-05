@@ -339,8 +339,26 @@ DECLARE @total_royalties MONEY;
 EXEC get_total_royalties_by_author 'ID do Autor', @total_royalties OUTPUT;
 SELECT @total_royalties AS 'Total de Royalties';
 
+
+
 /*
 12. Crie um procedimento armazenado que retorne o valor total de royalties devidos por uma
 editora passada como parâmetro. Apresente os comandos utilizados para executar este
 procedimento.
 */
+
+CREATE PROCEDURE get_total_royalties_by_publisher
+    @publisher_id VARCHAR(255),
+    @total_royalties MONEY OUTPUT
+AS
+BEGIN
+    SELECT @total_royalties = SUM(titleauthor.royaltyper * titles.price * sales.qty)
+    FROM titleauthor
+    INNER JOIN titles ON titleauthor.title_id = titles.title_id
+    INNER JOIN sales ON titles.title_id = sales.title_id
+    WHERE titles.pub_id = @publisher_id;
+END;
+
+DECLARE @total_royalties MONEY;
+EXEC get_total_royalties_by_publisher 'ID da Editora', @total_royalties OUTPUT;
+SELECT @total_royalties AS 'Total de Royalties';
