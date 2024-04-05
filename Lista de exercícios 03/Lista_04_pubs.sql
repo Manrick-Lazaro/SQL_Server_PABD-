@@ -176,7 +176,7 @@ EXEC new_store
 	Apresente os comandos utilizados para executar este procedimento.
 */
 
-ALTER PROCEDURE delete_store_with_lass_than_null_sales AS
+CREATE PROCEDURE delete_store_with_lass_than_null_sales AS
 	DELETE FROM	
 		stores	
 	WHERE
@@ -184,3 +184,39 @@ ALTER PROCEDURE delete_store_with_lass_than_null_sales AS
 		
 
 EXEC delete_store_with_lass_than_null_sales
+
+
+
+/*
+	6. Crie um procedimento armazenado para listar os livros da editora com maior quantidade de
+	títulos editados. Apresentar a listagem incluindo a editora, o título do livro e o nome dos
+	autores.
+*/
+
+CREATE PROCEDURE list_books_by_top_publisher AS
+BEGIN
+    WITH top_publisher AS (
+        SELECT TOP 1 WITH TIES pub_id
+        FROM titles
+        GROUP BY pub_id
+        ORDER BY COUNT(*) DESC
+    )
+    SELECT 
+        publishers.pub_name AS editora,
+        titles.title AS titulo_livro,
+        STRING_AGG(authors.au_lname, ', ') AS nome_autores
+    FROM 
+        titles
+    INNER JOIN 
+        publishers ON publishers.pub_id = titles.pub_id
+    INNER JOIN 
+        titleauthor ON titles.title_id = titleauthor.title_id
+    INNER JOIN 
+        authors ON titleauthor.au_id = authors.au_id
+    WHERE 
+        titles.pub_id IN (SELECT pub_id FROM top_publisher)
+    GROUP BY 
+        publishers.pub_name, titles.title;
+END;
+
+EXEC list_books_by_top_publisher
