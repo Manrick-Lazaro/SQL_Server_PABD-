@@ -275,3 +275,22 @@ BEGIN
 END;
 
 EXEC list_titles_with_unequal_royalties;
+
+/*
+	9. Crie um procedimento armazenado que liste o nome e o telefone dos autores que não têm
+	livros publicados. Apresente os comandos utilizados para executar este procedimento.
+*/
+
+CREATE PROCEDURE list_authors_without_books
+AS
+BEGIN
+    SELECT 
+        au_fname + ' ' + au_lname AS nome_autor,
+        phone AS telefone
+    FROM 
+        authors
+    WHERE 
+        au_id NOT IN (SELECT DISTINCT au_id FROM titleauthor);
+END;
+
+EXEC list_authors_without_books;
