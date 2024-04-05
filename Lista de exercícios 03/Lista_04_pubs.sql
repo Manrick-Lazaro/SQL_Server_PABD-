@@ -220,3 +220,33 @@ BEGIN
 END;
 
 EXEC list_books_by_top_publisher
+
+
+
+/*
+	7. Crie um procedimento armazenado que retorne em um parâmetro de saída o nome do autor
+	cujo valor médio de custo dos seus livros seja o mais alto. Apresentar os comandos para
+	acionar o procedimento e mostrar o nome do autor.
+*/
+
+CREATE PROCEDURE get_author_with_highest_avg_cost
+    @author_name VARCHAR(100) OUTPUT
+AS
+BEGIN
+    SELECT TOP 1 @author_name = 
+        authors.au_lname
+    FROM 
+        authors
+    INNER JOIN 
+        titleauthor ON authors.au_id = titleauthor.au_id
+    INNER JOIN 
+        titles ON titleauthor.title_id = titles.title_id
+    GROUP BY 
+        authors.au_lname
+    ORDER BY 
+        AVG(titles.price) DESC;
+END;
+
+DECLARE @author VARCHAR(100);
+EXEC get_author_with_highest_avg_cost @author OUTPUT;
+SELECT 'Autor com valor médio de custo mais alto: ' + COALESCE(author, 'Nenhum autor encontrado') AS 'Autor';
